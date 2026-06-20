@@ -6,11 +6,12 @@
  * so this file is safe to commit to a public repo.
  *
  * Required Script properties:
- *   NTFY_TOPIC          your secret ntfy topic name (pick a long, hard-to-guess string)
+ *   TELEGRAM_TOKEN      bot token from @BotFather
+ *   TELEGRAM_CHAT_ID    your Telegram chat id (from the bot's getUpdates)
  *   GEMINI_APIKEY       your Google AI Studio (Gemini) api key
  *
  * Optional Script properties (have sensible defaults below):
- *   NTFY_SERVER, NTFY_TOKEN, GEMINI_MODEL, USE_AI, USER_CONTEXT,
+ *   GEMINI_MODEL, USE_AI, USER_CONTEXT,
  *   IMPORTANT_SENDERS, IMPORTANT_KEYWORDS, SUMMARY_HOURS, CHECK_MINUTES,
  *   ALERT_LABEL, LOOKBACK, MAX_BATCH
  */
@@ -23,11 +24,9 @@ function getConfig() {
   }
 
   return {
-    // ---- Delivery: ntfy (set NTFY_TOPIC in Script properties) ----
-    NTFY_TOPIC:  get('NTFY_TOPIC', ''),                       // your secret topic name
-    NTFY_SERVER: get('NTFY_SERVER', 'https://ntfy.sh'),       // self-host? point here
-    NTFY_TOKEN:  get('NTFY_TOKEN', ''),                        // optional: free ntfy account token
-                                                              // -> per-account limits (avoids shared-IP 429s)
+    // ---- Delivery: Telegram (set these in Script properties) ----
+    TELEGRAM_TOKEN:   get('TELEGRAM_TOKEN', ''),    // bot token from @BotFather
+    TELEGRAM_CHAT_ID: get('TELEGRAM_CHAT_ID', ''),  // your chat id (from getUpdates)
 
     // ---- AI secret ----
     GEMINI_APIKEY: get('GEMINI_APIKEY', ''),

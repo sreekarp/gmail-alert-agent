@@ -10,11 +10,10 @@
  * --------------------------------------------------------------------------
  * Property            | Required | Example value
  * --------------------------------------------------------------------------
- * NTFY_TOPIC          |   yes    | sreekar-mail-9f3kx2qz   (SECRET: pick a long random string)
+ * TELEGRAM_TOKEN      |   yes    | 8123456:AAE1xxxxxxxx    (from @BotFather)
+ * TELEGRAM_CHAT_ID    |   yes    | 123456789               (your chat id, from getUpdates)
  * GEMINI_APIKEY       |   yes*   | AIzaSy...               (* required when USE_AI=true)
  *
- * NTFY_SERVER         |   no     | https://ntfy.sh         (only change if you self-host ntfy)
- * NTFY_TOKEN          |   no     | tk_xxxxxxxx             (free ntfy account token; avoids shared-IP 429s)
  * GEMINI_MODEL        |   no     | gemini-2.5-flash        (any current free Flash model)
  * USE_AI              |   no     | true                    ("false" = rule-only, you maintain lists)
  * USER_CONTEXT        |   no     | I am actively applying for jobs. Treat as important: ...
@@ -27,9 +26,8 @@
  * MAX_BATCH           |   no     | 25                      (max mails sent to AI per run)
  * --------------------------------------------------------------------------
  *
- * Minimum to get running: NTFY_TOPIC, GEMINI_APIKEY.
+ * Minimum to get running: TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, GEMINI_APIKEY.
  * Everything else can stay default.
  *
- * NOTE on NTFY_TOPIC: anyone who knows your topic name can read your alerts
- * (and send to it). Treat it like a password — make it long and random.
+ * NOTE: keep TELEGRAM_TOKEN secret — anyone with it can post as your bot.
  */

@@ -9,7 +9,7 @@ A personal AI agent that watches your Gmail and:
 
 **Cost: ₹0.** No server, no laptop left on. It runs entirely inside **Google Apps Script**
 (Google's free cloud), which has native Gmail access and free scheduled triggers. Alerts are delivered
-through **[ntfy](https://ntfy.sh)** — a free, no-account push service with a Play Store app.
+through a **Telegram bot** — free, reliable, and rate-limited per-bot (not per-IP).
 
 ---
 
@@ -17,11 +17,11 @@ through **[ntfy](https://ntfy.sh)** — a free, no-account push service with a P
 
 ```
 Google Apps Script (free, runs in your Google account)
-  ├─ every 10 min  → checkImportantMail()  → Gemini classifies → ntfy push (📱 your phone)
-  └─ 09:00 & 19:00 → sendDailySummary()    → Gemini summarizes → ntfy push (📱 your phone)
+  ├─ every 10 min  → checkImportantMail()  → Gemini classifies → Telegram (📱 your phone)
+  └─ 09:00 & 19:00 → sendDailySummary()    → Gemini summarizes → Telegram (📱 your phone)
 ```
 
-- **Delivery:** free [ntfy](https://ntfy.sh) — install the app, pick a secret topic, done. No account/keys.
+- **Delivery:** free **Telegram bot** — create one via @BotFather, store the token + your chat id.
 - **AI:** free-tier [Google Gemini](https://aistudio.google.com) (one API key).
 - **Importance:** AI by default; you can also add must-alert senders/keywords as a fast-path.
 - **No duplicate alerts:** each message is alerted at most once (tracked internally + a `wa-alerted` Gmail label).
@@ -29,9 +29,10 @@ Google Apps Script (free, runs in your Google account)
 > ⏱️ Alerts are **near-real-time (~10 min, configurable via `CHECK_MINUTES`)**, not instant. True instant
 > push would need a paid/always-on server, which defeats the "free, no server" goal.
 
-> 📲 **Why ntfy and not WhatsApp?** A free, server-less WhatsApp bridge (CallMeBot) exists but is an
-> unreliable third party that goes down often. ntfy is free, reliable, and just as instant. You can still
-> switch to Telegram/Discord/WhatsApp later by editing one function — see [below](#switching-channels).
+> 📲 **Why Telegram?** Free WhatsApp bridges (CallMeBot) are unreliable, and ntfy's free tier is
+> rate-limited **per IP** — which fails intermittently from Apps Script's shared Google IPs. Telegram's
+> limits are per-bot, so it's reliable and free. You can still switch to ntfy/Discord/WhatsApp later by
+> editing one function — see [below](#switching-channels).
 
 ---
 
@@ -58,14 +59,14 @@ gmail-alert-agent/
 
 ## Setup (one time, ~15 min)
 
-You'll do three things: set up ntfy on your phone, get a Gemini key, then paste the code into Apps Script.
+You'll do three things: create a Telegram bot, get a Gemini key, then load the code into Apps Script.
 
-### 1. Set up ntfy on your phone
-1. Install the **ntfy** app from the Play Store (Samsung/Android).
-2. Pick a **secret topic name** — treat it like a password, make it long and random,
-   e.g. `sreekar-mail-9f3kx2qz`. (Anyone who knows the topic can read your alerts.)
-3. In the app: **＋ → Subscribe to topic** → enter that exact topic name.
-   That's it — no account, no key.
+### 1. Create your Telegram bot
+1. Install **Telegram** on your phone, then message **@BotFather** → send `/newbot` → follow the prompts.
+   It gives you a **bot token** like `8123456:AAE1...`. Keep it secret.
+2. Open a chat with your new bot and send it any message (e.g. "hi") — this lets it message you back.
+3. Get your **chat id**: open `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates` in a browser and find
+   `"chat":{"id":123456789,...}`. That number is your `TELEGRAM_CHAT_ID`.
 
 ### 2. Get your free Gemini API key
 1. Go to **https://aistudio.google.com** → **Get API key** → create a key.
@@ -80,7 +81,7 @@ You'll do three things: set up ntfy on your phone, get a Gemini key, then paste 
 2. For each file in `src/`, create a matching script file (`+` → *Script*) and paste its contents.
    Also open the manifest (Project Settings → *Show "appsscript.json"*) and paste `appsscript.json`.
 3. **Project Settings (⚙) → Script properties → Add** the values from `Config.example.gs`
-   (at minimum `NTFY_TOPIC` and `GEMINI_APIKEY`).
+   (at minimum `TELEGRAM_TOKEN`, `TELEGRAM_CHAT_ID`, and `GEMINI_APIKEY`).
 
 **Option B — clasp (push code from this repo instead of copy-pasting):**
 ```bash
@@ -103,7 +104,7 @@ holds your private script id and is gitignored, so it's never committed.)
 
 ### 4. Authorize & turn it on
 1. In the editor, select **`testAlert`** → **Run**. Approve the permission prompts.
-   ✅ You should get an ntfy push on your phone within a few seconds.
+   ✅ You should get a Telegram message from your bot within a few seconds.
 2. Select **`setup`** → **Run**. This installs the triggers (10-min check + summaries).
 3. Done — it now runs on its own. Check **Triggers (⏰)** to confirm the triggers exist.
 
@@ -122,7 +123,7 @@ Everything is a Script property — change it in **Project Settings → Script p
 | `CHECK_MINUTES` | Important-mail poll interval. Allowed: 1, 5, 10, 15, 30. **Re-run `setup` after changing.** |
 | `GEMINI_MODEL` | e.g. `gemini-2.5-flash`. |
 | `USE_AI` | `false` = rule-only mode (you maintain the lists). |
-| `NTFY_TOKEN` | Free ntfy account token → per-account rate limits (avoids shared-IP `429`s). |
+| `TELEGRAM_TOKEN` / `TELEGRAM_CHAT_ID` | Your bot token and chat id (delivery). |
 
 To **pause** the agent: run `removeAllTriggers`. To resume: run `setup`.
 
@@ -131,20 +132,19 @@ To **pause** the agent: run `removeAllTriggers`. To resume: run `setup`.
 ## Verifying it works
 
 - **Important:** email yourself a job-style message (subject *"Interview invitation — please pick a slot"*).
-  Within ~10 min you get a push; the mail gets the `wa-alerted` label; it won't re-alert.
+  Within ~10 min you get a Telegram alert; the mail gets the `wa-alerted` label; it won't re-alert.
 - **Not important:** email yourself an obvious newsletter → no alert.
-- **Summary:** run `sendDailySummary` manually → a grouped digest push arrives.
+- **Summary:** run `sendDailySummary` manually → a grouped digest message arrives.
 
 ---
 
 ## Switching channels
 
-All delivery lives in one function — `sendNotification()` in [src/Notify.gs](src/Notify.gs). To change
-channels, edit only that function:
+This project uses **Telegram** by default. All delivery lives in one function —
+`sendNotification()` in [src/Notify.gs](src/Notify.gs). To use a different channel, edit only that function:
 
-- **Telegram** (free, very reliable): create a bot via **@BotFather**, get a token + your chat id,
-  store them as Script properties, and call `https://api.telegram.org/bot<token>/sendMessage`.
 - **Discord** (free): create a channel webhook and POST `{ "content": message }` to the webhook URL.
+- **ntfy** (free, but rate-limited per IP — unreliable from Apps Script): POST to `https://ntfy.sh/<topic>`.
 - **WhatsApp** (free but flaky): use [CallMeBot](https://www.callmebot.com/blog/free-api-whatsapp-messages/)
   — `https://api.callmebot.com/whatsapp.php?phone=<num>&text=<msg>&apikey=<key>`.
 
@@ -157,16 +157,13 @@ Nothing else in the project changes.
 - **Apps Script:** ~90 min/day trigger runtime + 20k `UrlFetch`/day — far above what this needs.
 - **Gemini free tier:** called only on poll runs that actually have new mail (most have none), one
   batched call per run. A few dozen calls/day typically. If you get huge volume, raise the poll interval.
-- **ntfy:** free public server, rate-limited **per IP**. Since Apps Script shares Google egress IPs with
-  other users, heavy bursts (or rapid manual testing) can hit a `429 too many requests`. Normal volume is
-  fine. To make it robust, create a **free ntfy.sh account**, generate an **access token**, and set it as
-  the `NTFY_TOKEN` Script property — your messages then count against your account (per-user limit) instead
-  of the shared IP.
+- **Telegram:** free, with generous per-bot limits (~30 messages/sec) — far beyond this project's needs,
+  and not affected by Apps Script's shared IPs (the reason we moved off ntfy).
 
 ## Privacy
 
 Your mail never leaves Google except the subject/short preview of *new* messages sent to Google's own
-Gemini API for classification/summary, and the alert text pushed to ntfy. No third party stores your
+Gemini API for classification/summary, and the alert text sent to Telegram. No third party stores your
 inbox. Secrets live only in your Apps Script project's Script properties, never in this repo.
 
 ## License

@@ -1,62 +1,68 @@
 /**
- * Notify.gs — the single message-delivery seam.
+ * Notify.gs — the single message-delivery seam (Telegram).
  *
  * Everything that pushes a notification to your phone goes through
- * sendNotification(). It uses ntfy (https://ntfy.sh) — a free, no-account
- * push service. To switch channels later (Telegram, Discord, WhatsApp...),
- * change ONLY this function; nothing else in the project needs to change.
+ * sendNotification(). It posts to the Telegram Bot API — free, reliable, and
+ * rate-limited per-bot (not per-IP), so it avoids the shared-IP problem that
+ * made ntfy unreliable from Apps Script. To switch channels again, change
+ * ONLY this function.
  */
 
 /**
- * Push a notification to your phone via ntfy.
- * @param {string} message  the notification body.
- * @param {Object} [opts]    { title, priority (1-5), tags }.
- * @return {number} HTTP status code from ntfy.
+ * Send a message to yourself via your Telegram bot.
+ * @param {string} message  the message body.
+ * @param {Object} [opts]    { title, click }  (priority/tags are ignored on Telegram).
+ * @return {number} HTTP status code from the Telegram API.
  */
 function sendNotification(message, opts) {
   opts = opts || {};
   var cfg = getConfig();
-  if (!cfg.NTFY_TOPIC) {
-    throw new Error('NTFY_TOPIC not set in Script properties.');
+  if (!cfg.TELEGRAM_TOKEN || !cfg.TELEGRAM_CHAT_ID) {
+    throw new Error('TELEGRAM_TOKEN / TELEGRAM_CHAT_ID not set in Script properties.');
   }
 
-  var url = cfg.NTFY_SERVER.replace(/\/+$/, '') + '/' + encodeURIComponent(cfg.NTFY_TOPIC);
+  // Title in bold, then the body. HTML parse mode, so escape dynamic content.
+  var text = (opts.title ? '<b>' + htmlEscape_(opts.title) + '</b>\n\n' : '') + htmlEscape_(message);
 
-  var headers = {};
-  if (opts.title)    headers['Title'] = asciiHeader_(opts.title);   // ntfy headers must be ASCII
-  if (opts.priority) headers['Priority'] = String(opts.priority);   // 1=min .. 5=urgent
-  if (opts.tags)     headers['Tags'] = opts.tags;                   // e.g. "email" (emoji shortcodes)
-  if (opts.click)    headers['Click'] = opts.click;                 // tap the notification -> open this URL
-  if (cfg.NTFY_TOKEN) headers['Authorization'] = 'Bearer ' + cfg.NTFY_TOKEN; // per-account rate limits
+  var payload = {
+    chat_id: cfg.TELEGRAM_CHAT_ID,
+    text: text,
+    parse_mode: 'HTML',
+    disable_web_page_preview: true
+  };
+  // A tappable "Open in Gmail" button when a link is provided.
+  if (opts.click) {
+    payload.reply_markup = { inline_keyboard: [[{ text: '📨 Open in Gmail', url: opts.click }]] };
+  }
 
+  var url = 'https://api.telegram.org/bot' + cfg.TELEGRAM_TOKEN + '/sendMessage';
   var res = UrlFetchApp.fetch(url, {
     method: 'post',
-    contentType: 'text/plain; charset=utf-8',
-    payload: message,
-    headers: headers,
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
     muteHttpExceptions: true
   });
 
   var code = res.getResponseCode();
   if (code < 200 || code >= 300) {
-    Logger.log('ntfy failed (%s): %s', code, res.getContentText());
+    Logger.log('Telegram failed (%s): %s', code, res.getContentText());
   }
   return code;
 }
 
-/** ntfy headers must be ASCII — strip anything else (e.g. emoji in titles). */
-function asciiHeader_(s) {
-  return String(s).replace(/[^\x20-\x7E]/g, '').trim() || 'Notification';
+/** Escape the characters Telegram's HTML parse mode treats specially. */
+function htmlEscape_(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 /**
- * Manual test — run this once from the editor to confirm a push actually
- * lands on your phone before wiring up the triggers.
+ * Manual test — run this once from the editor to confirm a message actually
+ * lands in your Telegram before wiring up the triggers.
  */
 function testAlert() {
   var code = sendNotification(
     'Your alert pipeline works! (' + new Date() + ')',
-    { title: 'Gmail-WA test', priority: 4, tags: 'white_check_mark' }
+    { title: '✅ Gmail-WA test' }
   );
   Logger.log('testAlert sent, status: %s', code);
 }
