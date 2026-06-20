@@ -74,7 +74,7 @@ function checkImportantMail() {
         ? h.summary.trim()
         : (c.snippet ? c.snippet.slice(0, 180) + '…' : '');
       var body = gist + '\n\nFrom: ' + cleanFrom_(c.from) + '\nSubject: ' + c.subject;
-      sendNotification(body, { title: title, priority: 5, tags: 'email' });
+      sendNotification(body, { title: title, priority: 5, tags: 'email', click: gmailMsgLink_(c.id) });
       try { c.thread.addLabel(alertLabel); } catch (e) { /* visibility only */ }
       if (idx < important.length - 1) Utilities.sleep(1000);
     });
@@ -112,6 +112,23 @@ function safeBody_(msg) {
 
 function getOrCreateLabel_(name) {
   return GmailApp.getUserLabelByName(name) || GmailApp.createLabel(name);
+}
+
+/* ---- Gmail deep links (tap the notification to open the mail) ---- */
+
+/** The account segment for Gmail URLs (the email of the account running the script). */
+function gmailAccount_() {
+  try { return Session.getActiveUser().getEmail() || '0'; } catch (e) { return '0'; }
+}
+
+/** Direct link to a specific message (#all works wherever it lives: inbox/promotions/etc). */
+function gmailMsgLink_(id) {
+  return 'https://mail.google.com/mail/u/' + gmailAccount_() + '/#all/' + id;
+}
+
+/** Link to the inbox (used by the digest). */
+function gmailInboxLink_() {
+  return 'https://mail.google.com/mail/u/' + gmailAccount_() + '/#inbox';
 }
 
 /* ---- processed-id store (per-message dedupe) ---- */

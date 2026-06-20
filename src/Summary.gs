@@ -47,7 +47,8 @@ function sendDailySummary() {
   }
 
   sendNotification(body,
-    { title: 'Mail digest (' + msgs.length + ' new)', priority: 3, tags: 'newspaper' });
+    { title: 'Mail digest (' + msgs.length + ' new)', priority: 3, tags: 'newspaper',
+      click: gmailInboxLink_() });
   props.setProperty('LAST_SUMMARY_TS', String(Date.now()));
 }
 
