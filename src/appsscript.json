@@ -1,6 +1,14 @@
 {
   "timeZone": "Asia/Kolkata",
-  "dependencies": {},
+  "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "Notifier",
+        "libraryId": "18TW6GE2iTjLrs1Xww5aXIRtyVA6lKn6lgpCHeH4X7MKrlXkiaCn2bElP",
+        "version": "2"
+      }
+    ]
+  },
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
   "oauthScopes": [
