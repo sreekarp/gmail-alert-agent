@@ -116,9 +116,9 @@ function getOrCreateLabel_(name) {
 
 /* ---- Gmail deep links (tap the notification to open the mail) ---- */
 
-/** The account segment for Gmail URLs (the email of the account running the script). */
+/** The account index for Gmail URLs (the N in mail.google.com/mail/u/N/), from config. */
 function gmailAccount_() {
-  try { return Session.getActiveUser().getEmail() || '0'; } catch (e) { return '0'; }
+  try { return getConfig().GMAIL_AUTHUSER || '0'; } catch (e) { return '0'; }
 }
 
 /** Direct link to a specific message (#all works wherever it lives: inbox/promotions/etc). */

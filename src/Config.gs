@@ -57,7 +57,11 @@ function getConfig() {
 
     ALERT_LABEL: get('ALERT_LABEL', 'wa-alerted'),  // Gmail label applied to alerted mail (visibility)
     LOOKBACK:    get('LOOKBACK', '1d'),             // Gmail search window for the 5-min check
-    MAX_BATCH:   parseInt(get('MAX_BATCH', '25'), 10) // max messages sent to AI per run
+    MAX_BATCH:   parseInt(get('MAX_BATCH', '25'), 10), // max messages sent to AI per run
+
+    // Gmail account index for the "open in Gmail" link = the N in mail.google.com/mail/u/N/
+    // (open Gmail signed into the tracked account and read N from the URL). Default 0.
+    GMAIL_AUTHUSER: get('GMAIL_AUTHUSER', '0')
   };
 }
 

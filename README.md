@@ -130,6 +130,7 @@ Everything is a Script property — change it in **Project Settings → Script p
 | `IMPORTANT_KEYWORDS` | Comma-separated must-alert keywords. |
 | `SUMMARY_HOURS` | 24h clock, comma-separated, e.g. `9,19`. **Re-run `setup` after changing.** |
 | `CHECK_MINUTES` | Important-mail poll interval. Allowed: 1, 5, 10, 15, 30. **Re-run `setup` after changing.** |
+| `GMAIL_AUTHUSER` | Account index for the "open in Gmail" link — the `N` in `mail.google.com/mail/u/N/`. Set it to the tracked account's index (default 0). |
 | `GEMINI_MODEL` | e.g. `gemma-3-27b-it` (Gemma has a far higher free daily quota; `gemini-2.5-flash` free tier is only ~20/day). |
 | `USE_AI` | `false` = rule-only mode (you maintain the lists). |
 | `SLACK_WEBHOOK_URL` | Your Slack Incoming Webhook (delivery). |

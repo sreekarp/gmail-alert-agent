@@ -25,6 +25,7 @@
  * ALERT_LABEL         |   no     | wa-alerted              (Gmail label put on alerted mail)
  * LOOKBACK            |   no     | 1d                      (Gmail search window for the 5-min check)
  * MAX_BATCH           |   no     | 25                      (max mails sent to AI per run)
+ * GMAIL_AUTHUSER      |   no     | 0                       (account index N in mail.google.com/mail/u/N/ for the alert link)
  * --------------------------------------------------------------------------
  *
  * Minimum to get running: SLACK_WEBHOOK_URL, GEMINI_APIKEY (+ the Notifier library).
