@@ -39,15 +39,16 @@ Google Apps Script (free, runs in your Google account)
 
 ```
 gmail-alert-agent/
-├─ src/
+├─ src/                 # clasp rootDir — everything here is pushed to Apps Script
 │  ├─ Config.gs        # reads settings from Script properties — NO secrets in code
 │  ├─ Notify.gs        # sendNotification() — the one place to swap channels
 │  ├─ AI.gs            # Gemini classify + summarize
 │  ├─ Importance.gs    # checkImportantMail() — the instant-alert path
 │  ├─ Summary.gs       # sendDailySummary() — the digest path
-│  └─ Triggers.gs      # setup() installs the schedule
-├─ appsscript.json     # manifest (timezone + OAuth scopes)
+│  ├─ Triggers.gs      # setup() installs the schedule
+│  └─ appsscript.json  # manifest (timezone + OAuth scopes)
 ├─ Config.example.gs   # documents every Script property to set (no real values)
+├─ .clasp.json         # (gitignored) links local ↔ your Apps Script project id
 ├─ .gitignore
 ├─ LICENSE
 └─ README.md
@@ -81,14 +82,24 @@ You'll do three things: set up ntfy on your phone, get a Gemini key, then paste 
 3. **Project Settings (⚙) → Script properties → Add** the values from `Config.example.gs`
    (at minimum `NTFY_TOPIC` and `GEMINI_APIKEY`).
 
-**Option B — clasp (keeps GitHub ↔ Apps Script in sync):**
+**Option B — clasp (push code from this repo instead of copy-pasting):**
 ```bash
+# one-time
 npm install -g @google/clasp
 clasp login                      # sign in as sreekar0664@gmail.com
+# enable the Apps Script API once: https://script.google.com/home/usersettings
+
+# if you DON'T have a project yet:
 clasp create --title "Gmail Alert Agent" --type standalone --rootDir ./src
-clasp push
+
+# if you ALREADY have a project: put its Script ID in .clasp.json
+#   { "scriptId": "<from Project Settings → IDs>", "rootDir": "src" }
+
+# thereafter, every update is just:
+clasp push --force
 ```
-Then add the Script properties in the editor as in Option A, step 3.
+Then add the Script properties in the editor as in Option A, step 3. (`.clasp.json`
+holds your private script id and is gitignored, so it's never committed.)
 
 ### 4. Authorize & turn it on
 1. In the editor, select **`testAlert`** → **Run**. Approve the permission prompts.
