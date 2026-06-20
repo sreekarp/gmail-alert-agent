@@ -15,7 +15,7 @@
  *
  * Also add the shared `Notifier` library to the project (identifier "Notifier").
  *
- * GEMINI_MODEL        |   no     | gemini-2.0-flash        (free Flash model w/ generous daily quota)
+ * GEMINI_MODEL        |   no     | gemma-3-27b-it          (Gemma = much higher free RPD than gemini-2.5-flash's 20/day)
  * USE_AI              |   no     | true                    ("false" = rule-only, you maintain lists)
  * USER_CONTEXT        |   no     | I am actively applying for jobs. Treat as important: ...
  * IMPORTANT_SENDERS   |   no     | hr@company.com, naukri.com, linkedin.com

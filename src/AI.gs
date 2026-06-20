@@ -22,7 +22,9 @@ function geminiGenerate_(prompt, asJson) {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: { temperature: 0.2 }
   };
-  if (asJson) payload.generationConfig.responseMimeType = 'application/json';
+  // Gemma models don't support forced-JSON mode; rely on the prompt + parseJsonArray_ salvage instead.
+  var isGemma = /^gemma/i.test(cfg.GEMINI_MODEL);
+  if (asJson && !isGemma) payload.generationConfig.responseMimeType = 'application/json';
 
   var res = UrlFetchApp.fetch(url, {
     method: 'post',
@@ -66,7 +68,7 @@ function geminiClassify(batch, userContext) {
     'You are an email triage assistant. The user\'s context is:\n"' + userContext + '"\n\n' +
     'For each email below, decide if it is IMPORTANT enough to alert the user immediately ' +
     'on their phone. Be selective: only flag mail that truly needs prompt attention given the ' +
-    'context. Return ONLY a JSON array, one object per email, exactly like:\n' +
+    'context. Return ONLY raw JSON (no markdown, no code fences) — a JSON array, one object per email, exactly like:\n' +
     '[{"id":"<id>","important":true,"category":"interview","summary":"Recruiter from Acme invites you to a technical interview; pick a slot by Friday."}]\n' +
     'The "category" is one short word (e.g. interview, recruiter, assessment, offer, ' +
     'rejection, otp, payment, personal, other).\n' +
