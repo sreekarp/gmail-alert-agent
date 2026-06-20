@@ -27,6 +27,7 @@ function sendNotification(message, opts) {
   if (opts.priority) headers['Priority'] = String(opts.priority);   // 1=min .. 5=urgent
   if (opts.tags)     headers['Tags'] = opts.tags;                   // e.g. "email" (emoji shortcodes)
   if (opts.click)    headers['Click'] = opts.click;                 // tap the notification -> open this URL
+  if (cfg.NTFY_TOKEN) headers['Authorization'] = 'Bearer ' + cfg.NTFY_TOKEN; // per-account rate limits
 
   var res = UrlFetchApp.fetch(url, {
     method: 'post',

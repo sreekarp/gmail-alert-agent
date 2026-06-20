@@ -2,7 +2,7 @@
 
 A personal AI agent that watches your Gmail and:
 
-- 🔔 **Pushes an instant alert to your phone** the moment an **important** mail arrives (checked every 5 minutes).
+- 🔔 **Pushes an instant alert to your phone** the moment an **important** mail arrives (checked every 10 minutes, configurable).
 - 🗞️ **Sends a twice-daily summary** of what you received, grouped and one-lined by AI.
 - 🧠 **Auto-decides what's important** using a Google Gemini model tuned to *your* context
   (default: actively job-hunting — recruiter mail, interviews, assessments, offers, OTPs, bills…).
@@ -17,7 +17,7 @@ through **[ntfy](https://ntfy.sh)** — a free, no-account push service with a P
 
 ```
 Google Apps Script (free, runs in your Google account)
-  ├─ every 5 min   → checkImportantMail()  → Gemini classifies → ntfy push (📱 your phone)
+  ├─ every 10 min  → checkImportantMail()  → Gemini classifies → ntfy push (📱 your phone)
   └─ 09:00 & 19:00 → sendDailySummary()    → Gemini summarizes → ntfy push (📱 your phone)
 ```
 
@@ -26,8 +26,8 @@ Google Apps Script (free, runs in your Google account)
 - **Importance:** AI by default; you can also add must-alert senders/keywords as a fast-path.
 - **No duplicate alerts:** each message is alerted at most once (tracked internally + a `wa-alerted` Gmail label).
 
-> ⏱️ Alerts are **near-real-time (~5 min)**, not instant. True instant push would need a paid/always-on
-> server, which defeats the "free, no server" goal.
+> ⏱️ Alerts are **near-real-time (~10 min, configurable via `CHECK_MINUTES`)**, not instant. True instant
+> push would need a paid/always-on server, which defeats the "free, no server" goal.
 
 > 📲 **Why ntfy and not WhatsApp?** A free, server-less WhatsApp bridge (CallMeBot) exists but is an
 > unreliable third party that goes down often. ntfy is free, reliable, and just as instant. You can still
@@ -93,7 +93,7 @@ Then add the Script properties in the editor as in Option A, step 3.
 ### 4. Authorize & turn it on
 1. In the editor, select **`testAlert`** → **Run**. Approve the permission prompts.
    ✅ You should get an ntfy push on your phone within a few seconds.
-2. Select **`setup`** → **Run**. This installs the triggers (5-min check + summaries).
+2. Select **`setup`** → **Run**. This installs the triggers (10-min check + summaries).
 3. Done — it now runs on its own. Check **Triggers (⏰)** to confirm the triggers exist.
 
 ---
@@ -107,9 +107,11 @@ Everything is a Script property — change it in **Project Settings → Script p
 | `USER_CONTEXT` | Plain-English description of what's important to you. Edit anytime to retune the AI. |
 | `IMPORTANT_SENDERS` | Comma-separated must-alert senders/domains (fast-path, skips AI). |
 | `IMPORTANT_KEYWORDS` | Comma-separated must-alert keywords. |
-| `SUMMARY_HOURS` | 24h clock, comma-separated, e.g. `9,19`. |
+| `SUMMARY_HOURS` | 24h clock, comma-separated, e.g. `9,19`. **Re-run `setup` after changing.** |
+| `CHECK_MINUTES` | Important-mail poll interval. Allowed: 1, 5, 10, 15, 30. **Re-run `setup` after changing.** |
 | `GEMINI_MODEL` | e.g. `gemini-2.5-flash`. |
 | `USE_AI` | `false` = rule-only mode (you maintain the lists). |
+| `NTFY_TOKEN` | Free ntfy account token → per-account rate limits (avoids shared-IP `429`s). |
 
 To **pause** the agent: run `removeAllTriggers`. To resume: run `setup`.
 
@@ -118,7 +120,7 @@ To **pause** the agent: run `removeAllTriggers`. To resume: run `setup`.
 ## Verifying it works
 
 - **Important:** email yourself a job-style message (subject *"Interview invitation — please pick a slot"*).
-  Within ~5 min you get a push; the mail gets the `wa-alerted` label; it won't re-alert.
+  Within ~10 min you get a push; the mail gets the `wa-alerted` label; it won't re-alert.
 - **Not important:** email yourself an obvious newsletter → no alert.
 - **Summary:** run `sendDailySummary` manually → a grouped digest push arrives.
 
@@ -142,9 +144,13 @@ Nothing else in the project changes.
 ## Costs & limits (all comfortably within free tiers)
 
 - **Apps Script:** ~90 min/day trigger runtime + 20k `UrlFetch`/day — far above what this needs.
-- **Gemini free tier:** called only on 5-min runs that actually have new mail (most have none), one
+- **Gemini free tier:** called only on poll runs that actually have new mail (most have none), one
   batched call per run. A few dozen calls/day typically. If you get huge volume, raise the poll interval.
-- **ntfy:** free public server, rate-limited per topic (plenty for personal alerts). Self-hostable if needed.
+- **ntfy:** free public server, rate-limited **per IP**. Since Apps Script shares Google egress IPs with
+  other users, heavy bursts (or rapid manual testing) can hit a `429 too many requests`. Normal volume is
+  fine. To make it robust, create a **free ntfy.sh account**, generate an **access token**, and set it as
+  the `NTFY_TOKEN` Script property — your messages then count against your account (per-user limit) instead
+  of the shared IP.
 
 ## Privacy
 

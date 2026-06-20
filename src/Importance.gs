@@ -1,9 +1,9 @@
 /**
  * Importance.gs — the "instant alert" path.
  *
- * checkImportantMail() runs every 5 minutes (see Triggers.gs). It finds new
- * unread mail, decides what's important (optional rule fast-path, then ONE
- * batched Gemini call), and sends a WhatsApp alert for each important message.
+ * checkImportantMail() runs every CHECK_MINUTES minutes (default 10; see Triggers.gs).
+ * It finds new unread mail, decides what's important (optional rule fast-path, then
+ * ONE batched Gemini call), and sends a push alert for each important message.
  *
  * De-duplication is per-message via a small map of processed message ids kept
  * in Script properties (PROCESSED_IDS), pruned to the last 2 days. This is more

@@ -14,12 +14,14 @@
  * GEMINI_APIKEY       |   yes*   | AIzaSy...               (* required when USE_AI=true)
  *
  * NTFY_SERVER         |   no     | https://ntfy.sh         (only change if you self-host ntfy)
+ * NTFY_TOKEN          |   no     | tk_xxxxxxxx             (free ntfy account token; avoids shared-IP 429s)
  * GEMINI_MODEL        |   no     | gemini-2.5-flash        (any current free Flash model)
  * USE_AI              |   no     | true                    ("false" = rule-only, you maintain lists)
  * USER_CONTEXT        |   no     | I am actively applying for jobs. Treat as important: ...
  * IMPORTANT_SENDERS   |   no     | hr@company.com, naukri.com, linkedin.com
  * IMPORTANT_KEYWORDS  |   no     | otp, interview, offer, assessment, payment
  * SUMMARY_HOURS       |   no     | 9,19                    (24h clock, comma-separated)
+ * CHECK_MINUTES       |   no     | 10                      (important-mail poll; allowed: 1,5,10,15,30)
  * ALERT_LABEL         |   no     | wa-alerted              (Gmail label put on alerted mail)
  * LOOKBACK            |   no     | 1d                      (Gmail search window for the 5-min check)
  * MAX_BATCH           |   no     | 25                      (max mails sent to AI per run)

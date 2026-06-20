@@ -10,8 +10,8 @@
  *   GEMINI_APIKEY       your Google AI Studio (Gemini) api key
  *
  * Optional Script properties (have sensible defaults below):
- *   NTFY_SERVER, GEMINI_MODEL, USE_AI, USER_CONTEXT,
- *   IMPORTANT_SENDERS, IMPORTANT_KEYWORDS, SUMMARY_HOURS,
+ *   NTFY_SERVER, NTFY_TOKEN, GEMINI_MODEL, USE_AI, USER_CONTEXT,
+ *   IMPORTANT_SENDERS, IMPORTANT_KEYWORDS, SUMMARY_HOURS, CHECK_MINUTES,
  *   ALERT_LABEL, LOOKBACK, MAX_BATCH
  */
 
@@ -26,6 +26,8 @@ function getConfig() {
     // ---- Delivery: ntfy (set NTFY_TOPIC in Script properties) ----
     NTFY_TOPIC:  get('NTFY_TOPIC', ''),                       // your secret topic name
     NTFY_SERVER: get('NTFY_SERVER', 'https://ntfy.sh'),       // self-host? point here
+    NTFY_TOKEN:  get('NTFY_TOKEN', ''),                        // optional: free ntfy account token
+                                                              // -> per-account limits (avoids shared-IP 429s)
 
     // ---- AI secret ----
     GEMINI_APIKEY: get('GEMINI_APIKEY', ''),
@@ -50,6 +52,8 @@ function getConfig() {
     SUMMARY_HOURS: get('SUMMARY_HOURS', '9,19')
       .split(',').map(function (s) { return parseInt(s.trim(), 10); })
       .filter(function (n) { return !isNaN(n); }),
+
+    CHECK_MINUTES: parseInt(get('CHECK_MINUTES', '10'), 10),  // important-mail poll; allowed: 1,5,10,15,30
 
     ALERT_LABEL: get('ALERT_LABEL', 'wa-alerted'),  // Gmail label applied to alerted mail (visibility)
     LOOKBACK:    get('LOOKBACK', '1d'),             // Gmail search window for the 5-min check
