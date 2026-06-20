@@ -6,7 +6,7 @@
  * so this file is safe to commit to a public repo.
  *
  * Required Script properties:
- *   DISCORD_WEBHOOK_URL  the webhook URL of your Discord alert channel
+ *   SLACK_WEBHOOK_URL    the Incoming Webhook URL of your Slack alert channel
  *   GEMINI_APIKEY        your Google AI Studio (Gemini) api key
  *
  * Also required: add the shared `Notifier` library to this project
@@ -26,8 +26,8 @@ function getConfig() {
   }
 
   return {
-    // ---- Delivery: Discord (via the shared Notifier library) ----
-    DISCORD_WEBHOOK_URL: get('DISCORD_WEBHOOK_URL', ''),  // this agent's Discord channel webhook
+    // ---- Delivery: Slack (via the shared Notifier library) ----
+    SLACK_WEBHOOK_URL: get('SLACK_WEBHOOK_URL', ''),  // this agent's Slack Incoming Webhook URL
 
     // ---- AI secret ----
     GEMINI_APIKEY: get('GEMINI_APIKEY', ''),

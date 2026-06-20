@@ -4,7 +4,7 @@
  * Delegates to the shared `Notifier` library (add it via Editor → Libraries,
  * identifier `Notifier`). The channel + webhook live in THIS agent's own Script
  * properties and are passed to the library as config — so the same library can
- * serve many agents, each on its own Discord channel.
+ * serve many agents, each on its own Slack channel.
  *
  * To change channel for ALL agents at once, edit the library, not this file.
  */
@@ -17,19 +17,19 @@
  */
 function sendNotification(message, opts) {
   var cfg = getConfig();
-  if (!cfg.DISCORD_WEBHOOK_URL) {
-    throw new Error('DISCORD_WEBHOOK_URL not set in Script properties.');
+  if (!cfg.SLACK_WEBHOOK_URL) {
+    throw new Error('SLACK_WEBHOOK_URL not set in Script properties.');
   }
   return Notifier.send(
-    { channel: 'discord', webhookUrl: cfg.DISCORD_WEBHOOK_URL, username: 'Gmail Agent' },
+    { channel: 'slack', webhookUrl: cfg.SLACK_WEBHOOK_URL, username: 'Gmail Agent' },
     message, opts || {}
   );
 }
 
 /**
  * Manual test — run this once from the editor to confirm a message reaches your
- * Discord channel before wiring up the triggers. (Requires the Notifier library
- * to be added to this project, and DISCORD_WEBHOOK_URL set.)
+ * Slack channel before wiring up the triggers. (Requires the Notifier library
+ * to be added to this project, and SLACK_WEBHOOK_URL set.)
  */
 function testAlert() {
   var code = sendNotification(

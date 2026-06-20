@@ -9,7 +9,7 @@ A personal AI agent that watches your Gmail and:
 
 **Cost: ₹0.** No server, no laptop left on. It runs entirely inside **Google Apps Script**
 (Google's free cloud), which has native Gmail access and free scheduled triggers. Alerts are delivered
-through **Discord** (via the shared [`Notifier`](https://github.com/sreekarp/gas-notifier) library) — free,
+through **Slack** (via the shared [`Notifier`](https://github.com/sreekarp/gas-notifier) library) — free,
 works in India, and rate-limited per-webhook (not per-IP).
 
 ---
@@ -18,11 +18,11 @@ works in India, and rate-limited per-webhook (not per-IP).
 
 ```
 Google Apps Script (free, runs in your Google account)
-  ├─ every 10 min  → checkImportantMail()  → Gemini classifies → Notifier → Discord (📱 phone)
-  └─ 09:00 & 19:00 → sendDailySummary()    → Gemini summarizes → Notifier → Discord (📱 phone)
+  ├─ every 10 min  → checkImportantMail()  → Gemini classifies → Notifier → Slack (📱 phone)
+  └─ 09:00 & 19:00 → sendDailySummary()    → Gemini summarizes → Notifier → Slack (📱 phone)
 ```
 
-- **Delivery:** free **Discord webhook**, sent through the shared
+- **Delivery:** free **Slack Incoming Webhook**, sent through the shared
   [`Notifier`](https://github.com/sreekarp/gas-notifier) library (so future agents reuse one channel layer).
 - **AI:** free-tier [Google Gemini](https://aistudio.google.com) (one API key).
 - **Importance:** AI by default; you can also add must-alert senders/keywords as a fast-path.
@@ -31,10 +31,11 @@ Google Apps Script (free, runs in your Google account)
 > ⏱️ Alerts are **near-real-time (~10 min, configurable via `CHECK_MINUTES`)**, not instant. True instant
 > push would need a paid/always-on server, which defeats the "free, no server" goal.
 
-> 📲 **Why Discord?** WhatsApp bridges (CallMeBot) are unreliable; ntfy's free tier is rate-limited **per IP**
-> (fails intermittently from Apps Script's shared Google IPs); Telegram is currently blocked in India.
-> Discord is free, works in India, and its webhooks are per-webhook rate-limited. Delivery goes through the
-> shared `Notifier` library, so switching channels later is a one-library change — see [below](#switching-channels).
+> 📲 **Why Slack?** WhatsApp bridges (CallMeBot) are unreliable; ntfy *and* Discord rate-limit **per IP**
+> (Discord via Cloudflare `1015`) and fail intermittently from Apps Script's shared Google IPs; Telegram is
+> currently blocked in India. Slack is free, works in India, and its webhooks are limited **per-webhook**,
+> so the shared-IP problem doesn't apply. Delivery goes through the shared `Notifier` library, so switching
+> channels later is a one-library change — see [below](#switching-channels).
 
 ---
 
@@ -61,13 +62,15 @@ gmail-alert-agent/
 
 ## Setup (one time, ~15 min)
 
-You'll do these things: set up the Discord channel + Notifier library, get a Gemini key, then load the
+You'll do these things: set up the Slack channel + Notifier library, get a Gemini key, then load the
 code into Apps Script.
 
-### 1. Create your Discord channel webhook
-1. Install **Discord** on your phone and create a server (or reuse one) → a channel, e.g. `#gmail-alerts`.
-2. Channel **⚙ → Integrations → Webhooks → New Webhook** → **Copy Webhook URL**. That's your
-   `DISCORD_WEBHOOK_URL`. Keep it secret.
+### 1. Create your Slack Incoming Webhook
+1. Install **Slack** on your phone and create a free workspace (or reuse one) → a channel, e.g.
+   `#gmail-alerts`. Set the channel's notifications to **All** so pushes arrive.
+2. Create an **Incoming Webhook**: https://api.slack.com/messaging/webhooks (or workspace → Apps →
+   "Incoming Webhooks" → Add to Slack → pick the channel) → **Copy Webhook URL**
+   (`https://hooks.slack.com/services/...`). That's your `SLACK_WEBHOOK_URL`. Keep it secret.
 
 ### 1b. Add the shared Notifier library
 This agent sends through the [`Notifier`](https://github.com/sreekarp/gas-notifier) library. In the Apps
@@ -87,7 +90,7 @@ identifier to **`Notifier`** → Add. (See the gas-notifier README for deploying
 2. For each file in `src/`, create a matching script file (`+` → *Script*) and paste its contents.
    Also open the manifest (Project Settings → *Show "appsscript.json"*) and paste `appsscript.json`.
 3. **Project Settings (⚙) → Script properties → Add** the values from `Config.example.gs`
-   (at minimum `DISCORD_WEBHOOK_URL` and `GEMINI_APIKEY`).
+   (at minimum `SLACK_WEBHOOK_URL` and `GEMINI_APIKEY`).
 
 **Option B — clasp (push code from this repo instead of copy-pasting):**
 ```bash
@@ -110,7 +113,7 @@ holds your private script id and is gitignored, so it's never committed.)
 
 ### 4. Authorize & turn it on
 1. In the editor, select **`testAlert`** → **Run**. Approve the permission prompts.
-   ✅ You should get a message in your Discord channel within a few seconds.
+   ✅ You should get a message in your Slack channel within a few seconds.
 2. Select **`setup`** → **Run**. This installs the triggers (10-min check + summaries).
 3. Done — it now runs on its own. Check **Triggers (⏰)** to confirm the triggers exist.
 
@@ -129,7 +132,7 @@ Everything is a Script property — change it in **Project Settings → Script p
 | `CHECK_MINUTES` | Important-mail poll interval. Allowed: 1, 5, 10, 15, 30. **Re-run `setup` after changing.** |
 | `GEMINI_MODEL` | e.g. `gemini-2.5-flash`. |
 | `USE_AI` | `false` = rule-only mode (you maintain the lists). |
-| `DISCORD_WEBHOOK_URL` | Your Discord channel webhook (delivery). |
+| `SLACK_WEBHOOK_URL` | Your Slack Incoming Webhook (delivery). |
 
 To **pause** the agent: run `removeAllTriggers`. To resume: run `setup`.
 
@@ -138,7 +141,7 @@ To **pause** the agent: run `removeAllTriggers`. To resume: run `setup`.
 ## Verifying it works
 
 - **Important:** email yourself a job-style message (subject *"Interview invitation — please pick a slot"*).
-  Within ~10 min you get a Discord alert; the mail gets the `wa-alerted` label; it won't re-alert.
+  Within ~10 min you get a Slack alert; the mail gets the `wa-alerted` label; it won't re-alert.
 - **Not important:** email yourself an obvious newsletter → no alert.
 - **Summary:** run `sendDailySummary` manually → a grouped digest message arrives.
 
@@ -146,7 +149,7 @@ To **pause** the agent: run `removeAllTriggers`. To resume: run `setup`.
 
 ## Switching channels
 
-This project uses **Discord** by default, and all delivery goes through the shared
+This project uses **Slack** by default, and all delivery goes through the shared
 [`Notifier`](https://github.com/sreekarp/gas-notifier) library. `Notify.gs` here is just a 6-line wrapper.
 
 - **To switch channel for THIS agent only:** change the `channel` (and config) passed to `Notifier.send`
@@ -163,13 +166,14 @@ Nothing else in this project changes.
 - **Apps Script:** ~90 min/day trigger runtime + 20k `UrlFetch`/day — far above what this needs.
 - **Gemini free tier:** called only on poll runs that actually have new mail (most have none), one
   batched call per run. A few dozen calls/day typically. If you get huge volume, raise the poll interval.
-- **Discord:** free; webhooks are rate-limited **per webhook** (~30/min) — far beyond this project's needs,
-  and not affected by Apps Script's shared IPs (the reason we moved off ntfy). Works in India.
+- **Slack:** free; Incoming Webhooks are rate-limited **per webhook** (~1/sec, short bursts ok) — far
+  beyond this project's needs, and not affected by Apps Script's shared IPs (why we moved off ntfy/Discord).
+  Works in India, no VPN.
 
 ## Privacy
 
 Your mail never leaves Google except the subject/short preview of *new* messages sent to Google's own
-Gemini API for classification/summary, and the alert text sent to Discord. No third party stores your
+Gemini API for classification/summary, and the alert text sent to Slack. No third party stores your
 inbox. Secrets live only in your Apps Script project's Script properties, never in this repo.
 
 ## License

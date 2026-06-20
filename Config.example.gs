@@ -10,7 +10,7 @@
  * --------------------------------------------------------------------------
  * Property            | Required | Example value
  * --------------------------------------------------------------------------
- * DISCORD_WEBHOOK_URL |   yes    | https://discord.com/api/webhooks/123/abc   (your channel webhook)
+ * SLACK_WEBHOOK_URL   |   yes    | https://hooks.slack.com/services/T../B../xxxx  (Incoming Webhook)
  * GEMINI_APIKEY       |   yes*   | AIzaSy...               (* required when USE_AI=true)
  *
  * Also add the shared `Notifier` library to the project (identifier "Notifier").
@@ -27,8 +27,8 @@
  * MAX_BATCH           |   no     | 25                      (max mails sent to AI per run)
  * --------------------------------------------------------------------------
  *
- * Minimum to get running: DISCORD_WEBHOOK_URL, GEMINI_APIKEY (+ the Notifier library).
+ * Minimum to get running: SLACK_WEBHOOK_URL, GEMINI_APIKEY (+ the Notifier library).
  * Everything else can stay default.
  *
- * NOTE: keep DISCORD_WEBHOOK_URL secret — anyone with it can post to your channel.
+ * NOTE: keep SLACK_WEBHOOK_URL secret — anyone with it can post to your channel.
  */
