@@ -10,21 +10,24 @@
  * --------------------------------------------------------------------------
  * Property            | Required | Example value
  * --------------------------------------------------------------------------
- * WHATSAPP_PHONE      |   yes    | 919876543210        (your number, country code, no +)
- * CALLMEBOT_APIKEY    |   yes    | 123456              (from the CallMeBot WhatsApp activation)
- * GEMINI_APIKEY       |   yes*   | AIzaSy...           (* required when USE_AI=true)
+ * NTFY_TOPIC          |   yes    | sreekar-mail-9f3kx2qz   (SECRET: pick a long random string)
+ * GEMINI_APIKEY       |   yes*   | AIzaSy...               (* required when USE_AI=true)
  *
- * GEMINI_MODEL        |   no     | gemini-2.5-flash    (any current free Flash model)
- * USE_AI              |   no     | true                ("false" = rule-only, you maintain lists)
+ * NTFY_SERVER         |   no     | https://ntfy.sh         (only change if you self-host ntfy)
+ * GEMINI_MODEL        |   no     | gemini-2.5-flash        (any current free Flash model)
+ * USE_AI              |   no     | true                    ("false" = rule-only, you maintain lists)
  * USER_CONTEXT        |   no     | I am actively applying for jobs. Treat as important: ...
  * IMPORTANT_SENDERS   |   no     | hr@company.com, naukri.com, linkedin.com
  * IMPORTANT_KEYWORDS  |   no     | otp, interview, offer, assessment, payment
- * SUMMARY_HOURS       |   no     | 9,19                (24h clock, comma-separated)
- * ALERT_LABEL         |   no     | wa-alerted          (Gmail label put on alerted mail)
- * LOOKBACK            |   no     | 1d                  (Gmail search window for the 5-min check)
- * MAX_BATCH           |   no     | 25                  (max mails sent to AI per run)
+ * SUMMARY_HOURS       |   no     | 9,19                    (24h clock, comma-separated)
+ * ALERT_LABEL         |   no     | wa-alerted              (Gmail label put on alerted mail)
+ * LOOKBACK            |   no     | 1d                      (Gmail search window for the 5-min check)
+ * MAX_BATCH           |   no     | 25                      (max mails sent to AI per run)
  * --------------------------------------------------------------------------
  *
- * Minimum to get running: WHATSAPP_PHONE, CALLMEBOT_APIKEY, GEMINI_APIKEY.
+ * Minimum to get running: NTFY_TOPIC, GEMINI_APIKEY.
  * Everything else can stay default.
+ *
+ * NOTE on NTFY_TOPIC: anyone who knows your topic name can read your alerts
+ * (and send to it). Treat it like a password — make it long and random.
  */

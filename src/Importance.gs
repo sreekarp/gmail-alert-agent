@@ -64,12 +64,16 @@ function checkImportantMail() {
       remaining.forEach(function (c) { handled[c.id] = true; });
     }
 
-    // 3) Alert + label important ones; throttle for CallMeBot.
+    // 3) Alert + label important ones.
     var alertLabel = getOrCreateLabel_(cfg.ALERT_LABEL);
     important.forEach(function (h, idx) {
-      sendWhatsApp(formatAlert_(h.item, h.category));
-      try { h.item.thread.addLabel(alertLabel); } catch (e) { /* visibility only */ }
-      if (idx < important.length - 1) Utilities.sleep(3000);
+      var c = h.item;
+      var title = 'Important mail' + (h.category ? ' [' + h.category + ']' : '');
+      var body = 'From: ' + c.from + '\nSubject: ' + c.subject
+        + (c.snippet ? '\n\n' + c.snippet.slice(0, 200) : '');
+      sendNotification(body, { title: title, priority: 5, tags: 'email' });
+      try { c.thread.addLabel(alertLabel); } catch (e) { /* visibility only */ }
+      if (idx < important.length - 1) Utilities.sleep(1000);
     });
 
     // 4) Record everything we decided so we never reprocess it.
@@ -96,14 +100,6 @@ function ruleMatch_(c, cfg) {
     if (hay.indexOf(cfg.IMPORTANT_KEYWORDS[j]) !== -1) return 'keyword';
   }
   return null;
-}
-
-function formatAlert_(c, category) {
-  var cat = category ? ('[' + category + '] ') : '';
-  return '📧 Important mail ' + cat + '\n'
-    + 'From: ' + c.from + '\n'
-    + 'Subject: ' + c.subject + '\n\n'
-    + (c.snippet ? c.snippet.slice(0, 200) : '');
 }
 
 function safeBody_(msg) {

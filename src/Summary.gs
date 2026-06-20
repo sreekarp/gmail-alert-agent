@@ -26,7 +26,8 @@ function sendDailySummary() {
   });
 
   if (!msgs.length) {
-    sendWhatsApp('🗞️ Mail digest: no new mail since the last summary.');
+    sendNotification('No new mail since the last summary.',
+      { title: 'Mail digest', priority: 2, tags: 'newspaper' });
     props.setProperty('LAST_SUMMARY_TS', String(Date.now()));
     return;
   }
@@ -45,7 +46,8 @@ function sendDailySummary() {
     }).join('\n');
   }
 
-  sendWhatsApp('🗞️ Mail digest (' + msgs.length + ' new)\n\n' + body);
+  sendNotification(body,
+    { title: 'Mail digest (' + msgs.length + ' new)', priority: 3, tags: 'newspaper' });
   props.setProperty('LAST_SUMMARY_TS', String(Date.now()));
 }
 

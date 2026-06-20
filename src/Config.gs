@@ -6,12 +6,11 @@
  * so this file is safe to commit to a public repo.
  *
  * Required Script properties:
- *   WHATSAPP_PHONE      e.g. 919876543210   (country code, digits only, no +)
- *   CALLMEBOT_APIKEY    your CallMeBot api key
+ *   NTFY_TOPIC          your secret ntfy topic name (pick a long, hard-to-guess string)
  *   GEMINI_APIKEY       your Google AI Studio (Gemini) api key
  *
  * Optional Script properties (have sensible defaults below):
- *   GEMINI_MODEL, USE_AI, USER_CONTEXT,
+ *   NTFY_SERVER, GEMINI_MODEL, USE_AI, USER_CONTEXT,
  *   IMPORTANT_SENDERS, IMPORTANT_KEYWORDS, SUMMARY_HOURS,
  *   ALERT_LABEL, LOOKBACK, MAX_BATCH
  */
@@ -24,10 +23,12 @@ function getConfig() {
   }
 
   return {
-    // ---- Secrets (set in Script properties) ----
-    WHATSAPP_PHONE:   get('WHATSAPP_PHONE', ''),
-    CALLMEBOT_APIKEY: get('CALLMEBOT_APIKEY', ''),
-    GEMINI_APIKEY:    get('GEMINI_APIKEY', ''),
+    // ---- Delivery: ntfy (set NTFY_TOPIC in Script properties) ----
+    NTFY_TOPIC:  get('NTFY_TOPIC', ''),                       // your secret topic name
+    NTFY_SERVER: get('NTFY_SERVER', 'https://ntfy.sh'),       // self-host? point here
+
+    // ---- AI secret ----
+    GEMINI_APIKEY: get('GEMINI_APIKEY', ''),
 
     // ---- AI behaviour ----
     GEMINI_MODEL: get('GEMINI_MODEL', 'gemini-2.5-flash'),
