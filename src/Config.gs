@@ -6,9 +6,11 @@
  * so this file is safe to commit to a public repo.
  *
  * Required Script properties:
- *   TELEGRAM_TOKEN      bot token from @BotFather
- *   TELEGRAM_CHAT_ID    your Telegram chat id (from the bot's getUpdates)
- *   GEMINI_APIKEY       your Google AI Studio (Gemini) api key
+ *   DISCORD_WEBHOOK_URL  the webhook URL of your Discord alert channel
+ *   GEMINI_APIKEY        your Google AI Studio (Gemini) api key
+ *
+ * Also required: add the shared `Notifier` library to this project
+ *   (Editor -> Libraries -> add by Script ID -> identifier "Notifier").
  *
  * Optional Script properties (have sensible defaults below):
  *   GEMINI_MODEL, USE_AI, USER_CONTEXT,
@@ -24,9 +26,8 @@ function getConfig() {
   }
 
   return {
-    // ---- Delivery: Telegram (set these in Script properties) ----
-    TELEGRAM_TOKEN:   get('TELEGRAM_TOKEN', ''),    // bot token from @BotFather
-    TELEGRAM_CHAT_ID: get('TELEGRAM_CHAT_ID', ''),  // your chat id (from getUpdates)
+    // ---- Delivery: Discord (via the shared Notifier library) ----
+    DISCORD_WEBHOOK_URL: get('DISCORD_WEBHOOK_URL', ''),  // this agent's Discord channel webhook
 
     // ---- AI secret ----
     GEMINI_APIKEY: get('GEMINI_APIKEY', ''),

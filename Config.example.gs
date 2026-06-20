@@ -10,9 +10,10 @@
  * --------------------------------------------------------------------------
  * Property            | Required | Example value
  * --------------------------------------------------------------------------
- * TELEGRAM_TOKEN      |   yes    | 8123456:AAE1xxxxxxxx    (from @BotFather)
- * TELEGRAM_CHAT_ID    |   yes    | 123456789               (your chat id, from getUpdates)
+ * DISCORD_WEBHOOK_URL |   yes    | https://discord.com/api/webhooks/123/abc   (your channel webhook)
  * GEMINI_APIKEY       |   yes*   | AIzaSy...               (* required when USE_AI=true)
+ *
+ * Also add the shared `Notifier` library to the project (identifier "Notifier").
  *
  * GEMINI_MODEL        |   no     | gemini-2.5-flash        (any current free Flash model)
  * USE_AI              |   no     | true                    ("false" = rule-only, you maintain lists)
@@ -26,8 +27,8 @@
  * MAX_BATCH           |   no     | 25                      (max mails sent to AI per run)
  * --------------------------------------------------------------------------
  *
- * Minimum to get running: TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, GEMINI_APIKEY.
+ * Minimum to get running: DISCORD_WEBHOOK_URL, GEMINI_APIKEY (+ the Notifier library).
  * Everything else can stay default.
  *
- * NOTE: keep TELEGRAM_TOKEN secret — anyone with it can post as your bot.
+ * NOTE: keep DISCORD_WEBHOOK_URL secret — anyone with it can post to your channel.
  */
