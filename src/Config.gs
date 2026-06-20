@@ -33,7 +33,7 @@ function getConfig() {
     GEMINI_APIKEY: get('GEMINI_APIKEY', ''),
 
     // ---- AI behaviour ----
-    GEMINI_MODEL: get('GEMINI_MODEL', 'gemma-3-27b-it'),  // Gemma has a much higher free RPD than gemini-2.5-flash (20/day)
+    GEMINI_MODEL: get('GEMINI_MODEL', 'gemini-3.1-flash-lite'),  // pick a model with a usable free RPD (gemini-2.5-flash is only 20/day)
     USE_AI:       get('USE_AI', 'true') === 'true',
 
     // What matters to you, in plain English. Edit this one line anytime to retune.
