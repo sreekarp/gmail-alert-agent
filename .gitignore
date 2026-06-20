@@ -1,0 +1,13 @@
+# clasp link file — contains YOUR private script id, never commit it
+.clasp.json
+
+# any local-only / secret-bearing files
+*.local.gs
+*.local.js
+secrets.*
+.env
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+node_modules/
