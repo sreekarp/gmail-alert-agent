@@ -67,9 +67,12 @@ function geminiClassify(batch, userContext) {
     'For each email below, decide if it is IMPORTANT enough to alert the user immediately ' +
     'on their phone. Be selective: only flag mail that truly needs prompt attention given the ' +
     'context. Return ONLY a JSON array, one object per email, exactly like:\n' +
-    '[{"id":"<id>","important":true,"category":"interview"}]\n' +
+    '[{"id":"<id>","important":true,"category":"interview","summary":"Recruiter from Acme invites you to a technical interview; pick a slot by Friday."}]\n' +
     'The "category" is one short word (e.g. interview, recruiter, assessment, offer, ' +
-    'rejection, otp, payment, personal, other).\n\n' +
+    'rejection, otp, payment, personal, other).\n' +
+    'The "summary" is a concise 1-2 sentence plain-text summary of what the email is about and ' +
+    'any action or deadline. Keep it under ~240 characters. (You may give a summary even when ' +
+    'important is false; it is only used for important ones.)\n\n' +
     'Emails:\n' + items;
 
   var out = geminiGenerate_(prompt, true);
@@ -81,7 +84,11 @@ function geminiClassify(batch, userContext) {
   var result = {};
   arr.forEach(function (o) {
     if (o && o.id != null) {
-      result[String(o.id)] = { important: !!o.important, category: o.category || 'other' };
+      result[String(o.id)] = {
+        important: !!o.important,
+        category: o.category || 'other',
+        summary: o.summary || ''
+      };
     }
   });
   return result;

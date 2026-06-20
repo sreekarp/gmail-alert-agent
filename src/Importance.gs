@@ -43,7 +43,7 @@ function checkImportantMail() {
     var remaining = [];
     candidates.forEach(function (c) {
       var hit = ruleMatch_(c, cfg);
-      if (hit) { important.push({ item: c, category: hit }); handled[c.id] = true; }
+      if (hit) { important.push({ item: c, category: hit, summary: '' }); handled[c.id] = true; }
       else { remaining.push(c); }
     });
 
@@ -55,7 +55,7 @@ function checkImportantMail() {
         var v = verdicts[c.id];
         if (v) {                                   // got a verdict -> decided
           handled[c.id] = true;
-          if (v.important) important.push({ item: c, category: v.category });
+          if (v.important) important.push({ item: c, category: v.category, summary: v.summary });
         }
         // no verdict -> leave unhandled, retry next run
       });
@@ -69,8 +69,11 @@ function checkImportantMail() {
     important.forEach(function (h, idx) {
       var c = h.item;
       var title = 'Important mail' + (h.category ? ' [' + h.category + ']' : '');
-      var body = 'From: ' + c.from + '\nSubject: ' + c.subject
-        + (c.snippet ? '\n\n' + c.snippet.slice(0, 200) : '');
+      // Prefer the AI's clean 1-2 line summary; fall back to a short snippet.
+      var gist = (h.summary && h.summary.trim())
+        ? h.summary.trim()
+        : (c.snippet ? c.snippet.slice(0, 180) + '…' : '');
+      var body = gist + '\n\nFrom: ' + cleanFrom_(c.from) + '\nSubject: ' + c.subject;
       sendNotification(body, { title: title, priority: 5, tags: 'email' });
       try { c.thread.addLabel(alertLabel); } catch (e) { /* visibility only */ }
       if (idx < important.length - 1) Utilities.sleep(1000);
